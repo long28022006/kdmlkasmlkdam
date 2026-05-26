@@ -1,59 +1,256 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Parks - Contact</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Photo Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1410;
+      --paper: #f5f0e8;
+      --accent: #c0392b;
+      --muted: #8a7f72;
+      --border: #d4c9b8;
+      --shadow: rgba(26,20,16,0.18);
+    }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      padding: 2rem 1rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    header h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── Preview Panel ── */
+    #image {
+      position: relative;
+      width: min(680px, 100%);
+      margin: 0 auto 3rem;
+      aspect-ratio: 16/9;
+      border: 1px solid var(--border);
+      background-color: #e8e2d8;
+      background-image: url('');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 6px 6px 0 var(--shadow);
+      transition: background-image 0.15s ease;
+    }
+
+    #image::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(26,20,16,0.55) 0%, transparent 55%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    #image.has-image::before { opacity: 1; }
+
+    #caption {
+      position: absolute;
+      bottom: 1.2rem;
+      left: 1.5rem;
+      right: 1.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      color: #fff;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+
+    #image.has-image #caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #placeholder-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-align: center;
+      padding: 1rem;
+      line-height: 1.7;
+      transition: opacity 0.2s ease;
+    }
+
+    #image.has-image #placeholder-text { opacity: 0; }
+
+    /* ── Thumbnail Grid ── */
+    h2 {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: center;
+      margin-bottom: 1.2rem;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 1rem;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .gallery img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      cursor: crosshair;
+      display: block;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      filter: grayscale(20%) contrast(1.05);
+    }
+
+    .gallery img:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 5px 5px 0 var(--accent);
+      filter: grayscale(0%) contrast(1.1);
+      z-index: 2;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3.5rem;
+      font-size: 0.65rem;
+      color: var(--border);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Skip to Main Content link (accessibility) -->
-    <a class="skip-link" href="#main-content">Skip to Main Content</a>
+<header>
+  <h1>Photo <em>Gallery</em></h1>
+  <p>Hover to preview &mdash; an interactive showcase</p>
+</header>
 
-    <header>
-        <h1>National Parks of America</h1>
-    </header>
+<!-- Preview panel — id="image" as required by the assignment -->
+<div id="image">
+  <p id="placeholder-text">Hover over an image below to display here.</p>
+  <p id="caption"></p>
+</div>
 
-    <nav>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/240px-The_Earth_seen_from_Apollo_17.jpg" alt="Earth from space logo">
-        <a href="index.html">Home</a>
-        <a href="parks.html">Parks</a>
-        <a href="contact.html">Contact</a>
-    </nav>
+<h2>// Collection</h2>
 
-    <main id="main-content">
-        <h2>Contact Us</h2>
-        <p>We would love to hear from you. Fill out the form below to get in touch.</p>
+<div class="gallery">
+  <img
+    src="https://picsum.photos/seed/alpine/400/300"
+    alt="Alpine Meadow"
+    onmouseover="upDate(this)"
+    onmouseout="unDo()"
+  />
+  <img
+    src="https://picsum.photos/seed/ocean7/400/300"
+    alt="Ocean Waves"
+    onmouseover="upDate(this)"
+    onmouseout="unDo()"
+  />
+  <img
+    src="https://picsum.photos/seed/forest3/400/300"
+    alt="Ancient Forest"
+    onmouseover="upDate(this)"
+    onmouseout="unDo()"
+  />
+  <img
+    src="https://picsum.photos/seed/desert9/400/300"
+    alt="Desert Dunes"
+    onmouseover="upDate(this)"
+    onmouseout="unDo()"
+  />
+  <img
+    src="https://picsum.photos/seed/city22/400/300"
+    alt="City at Dusk"
+    onmouseover="upDate(this)"
+    onmouseout="unDo()"
+  />
+  <img
+    src="https://picsum.photos/seed/lake55/400/300"
+    alt="Still Lake"
+    onmouseover="upDate(this)"
+    onmouseout="unDo()"
+  />
+</div>
 
-        <div class="grid">
-            <div>
-                <h3>Send a Message</h3>
-                <p><strong>Name:</strong> [Your Name Field]</p>
-                <p><strong>Email:</strong> [Your Email Field]</p>
-                <p><strong>Message:</strong> [Your Message Field]</p>
-                <p><strong>Submit:</strong> [Submit Button]</p>
-            </div>
-            <div>
-                <h3>Our Information</h3>
-                <ul>
-                    <li>Email: info@nationalparks.edu</li>
-                    <li>Phone: (555) 123-4567</li>
-                    <li>Address: 123 Nature Lane, Parkview, CA 90210</li>
-                </ul>
-                <h3>Office Hours</h3>
-                <ul>
-                    <li>Monday - Friday: 9am - 5pm</li>
-                    <li>Saturday: 10am - 2pm</li>
-                    <li>Sunday: Closed</li>
-                </ul>
-            </div>
-        </div>
-    </main>
+<footer>Interactive Photo Gallery &mdash; JavaScript DOM Assignment</footer>
 
-    <footer>
-        <p>&copy; 2025 National Parks Website | Homework 2 Project</p>
-    </footer>
+<script>
+  // ─── upDate ───────────────────────────────────────────────
+  // Called when the mouse enters a thumbnail image.
+  // previewPic  →  the <img> element being hovered
+  function upDate(previewPic) {
+    // 1. Confirm event is firing
+    console.log('upDate triggered');
+    console.log('alt:', previewPic.alt, '| src:', previewPic.src);
+
+    const panel = document.getElementById('image');
+
+    // 2. Set the alt text as the displayed caption
+    document.getElementById('caption').textContent = previewPic.alt;
+
+    // 3. Change the background image of #image to the hovered photo
+    panel.style.backgroundImage = "url('" + previewPic.src + "')";
+
+    // 4. Toggle helper class so CSS transitions fire
+    panel.classList.add('has-image');
+  }
+
+  // ─── unDo ─────────────────────────────────────────────────
+  // Called when the mouse leaves a thumbnail image.
+  function unDo() {
+    const panel = document.getElementById('image');
+
+    // 1. Clear the background image
+    panel.style.backgroundImage = "url('')";
+
+    // 2. Reset caption & placeholder text
+    document.getElementById('caption').textContent = '';
+
+    // 3. Remove helper class to restore original state
+    panel.classList.remove('has-image');
+  }
+</script>
 
 </body>
 </html>
